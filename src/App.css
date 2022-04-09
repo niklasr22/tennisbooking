@@ -1,0 +1,151 @@
+.App {
+  text-align: center;
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+h1 {
+  font-size: calc(10px + 4vmin);
+}
+
+.Counter {
+  display: block;
+  margin: 1em 0;
+  padding-bottom: 1em;
+}
+
+.Counter .CounterLabel {
+  display: block;
+  font-size: 1.2em;
+  padding-bottom: 0.7em;
+}
+
+.Counter button {
+  background-color: #f5d443;
+  color: #111;
+  border: 1px solid #514308;
+  border-radius: 0.4em;
+  font-size: 1.2em;
+  height: 4vmin;
+  min-width: 40px;
+  min-height: 40px;
+  width: 4vmin;
+  cursor: pointer;
+}
+
+.Counter button:hover, .Counter button:active {
+  background-color: #cfa238;
+  outline: none;
+}
+
+.Counter .CounterValue {
+  font-size: 1.2em;
+  padding: 0 1em;
+  min-width: 1.3em;
+  display: inline-block;
+}
+
+.PlayerTypes .Counter {
+  border-bottom: 1px solid #514308;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.Pricing {
+  background-color: #8c3333;
+  color: #fff;
+  border: 1px solid #514308;
+  border-radius: 0.4em;
+  font-size: 1.4em;
+  padding: 0.7em;
+  margin: 1em 0;
+}
+
+.Pricing span:first-of-type {
+  width: 50%;
+  display: inline-block;
+  left: 0;
+  position: relative;
+}
+
+.Pricing span:last-of-type {
+  width: 50%;
+  display: inline-block;
+  right: 0;
+  position: relative;
+}
+
+.Spinner {
+  height: 160px;
+  position: relative;
+}
+
+.Spinner::after {
+  content: " ";
+  border-width: 16px;
+  border-style: solid;
+  border-color: #8c3333 #f3f3f3 #f3f3f3;
+  border-image: initial;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: 2s linear 0s infinite normal none running rot_center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes rot_center {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.LogoWrapper {
+  padding: 1em;
+}
+
+@media only screen and (max-width: 800px) {
+  .LogoWrapper img {
+    width: 50vmin;
+  }
+}
+
+.OrderForm {
+  padding: 1em;
+}
