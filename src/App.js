@@ -1,12 +1,15 @@
 import './App.css';
 import React from 'react';
 import logo from './logo.svg';
+import {PAYPAL_CLIENT_ID} from './config.js'
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const initialOptions = {
-  "client-id": "AWM3mAoQzWAPdQvnIXsNcLFfdRoGII8RZlP1N_ypQQYDLS3gOa-pVVVPNDDSHRiFRXVofub7w0a3fhCr",
+  "client-id": PAYPAL_CLIENT_ID,
   currency: "EUR"
 };
+
+const endpoint = "http://tennisbooking.by-rousset.de/api.php/";
 
 function priceString(price) {
   return Number(price).toLocaleString("de", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "€";
@@ -44,7 +47,8 @@ class Counter extends React.Component {
   }
 
   render() {
-    return (<div className="Counter">
+    return (
+      <div className="Counter">
         <span className="CounterLabel">{this.props.label}</span>
         <div>
           <button className='CounterDecrease' onClick={() => this.decrease()}>-</button>
@@ -113,7 +117,7 @@ class OrderForm extends React.Component {
   }
 
   componentDidMount() {
-    fetch('http://tennisbooking.by-rousset.de/backend/api/prices/index.php')
+    fetch(endpoint + 'plans')
       .then(response => response.json())
       .then(data => {
         this.setState({
@@ -133,21 +137,36 @@ class OrderForm extends React.Component {
   render() {
     return (
       <div className='OrderForm'>
-        <p>Bitte geben Sie die Anzahl der Spieler je nach Status an:</p>
+        <p>Bitte geben Sie unten die Anzahl der Spieler je nach Status an. Es handelt sich insgesamt um eine Buchung für <strong>einen</strong> Tennisplatz.</p>
         <div className='PlayerTypes'>
           {this.state.counters}
         </div>
-        <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(p,v) => this.durationChange(v)}/>
+        <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(_p,v) => this.durationChange(v)}/>
         <div className='Pricing'><span>Preis:</span><span>{priceString(this.state.price)}</span></div>
         <p>{this.state.info}</p>
         <PayPalScriptProvider options={initialOptions}>
-            <PayPalButtons className="Payment" fundingSource="paypal" style={{
+            <PayPalButtons 
+              className="Payment" 
+              fundingSource="paypal" 
+              style={{
                 shape: 'pill',
                 color: 'silver',
                 layout: 'horizontal',
-                label: 'pay',
-            }}
-            disabled={!this.state.paymentEnabled} />
+                label: 'pay'}}
+              disabled={!this.state.paymentEnabled}
+              createOrder={(data, actions) => {
+                return fetch(endpoint + "order/create", {
+                  method: "post",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({"plans": []})
+                }).then((response) => response.json())
+                  .then((order) => {
+                    console.log(order);
+                    return order.id;
+                  });
+              }} />
         </PayPalScriptProvider>
       </div>
     );
