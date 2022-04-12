@@ -154,14 +154,20 @@ class OrderForm extends React.Component {
                 layout: 'horizontal',
                 label: 'pay'}}
               disabled={!this.state.paymentEnabled}
-              createOrder={(data, actions) => {
+              createOrder={(_d, _a) => {
+                console.log("hallo");
+                console.log(this.state);
+                let orderData = {items: this.state.selection.map((item, index) => ({id: this.state.plans[index].id, quantity: item}))};
+                console.log(orderData);
                 return fetch(endpoint + "order/create", {
                   method: "post",
                   headers: {
                     'Content-Type': 'application/json'
                   },
-                  body: JSON.stringify({"plans": []})
-                }).then((response) => response.json())
+                  body: JSON.stringify(orderData)
+                }).then((response) => {
+                  return response.json();
+                })
                   .then((order) => {
                     console.log(order);
                     return order.id;

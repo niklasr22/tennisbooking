@@ -1,5 +1,4 @@
 <?php
-include_once './config.php';
 class Paypal {
     private const API_BASE = "https://api-m.sandbox.paypal.com";
 
@@ -19,7 +18,7 @@ class Paypal {
         return $data->access_token;
     }
 
-    public static function createOrder($items): string {
+    public static function createOrder($items) {
         $accessToken = static::generateAccessToken();
 
         $price = 0.0;
@@ -60,13 +59,13 @@ class Paypal {
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
+        $response = json_decode(curl_exec($ch), true);
         curl_close($ch);
-        
+
         return $response;
     }
 
-    public static function capturePayment($paymentId): string {
+    public static function capturePayment(string $paymentId): string {
         $accessToken = static::generateAccessToken();
 
         $ch = curl_init(static::API_BASE . "/v2/checkout/orders" . $paymentId . "/capture");

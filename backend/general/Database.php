@@ -11,11 +11,9 @@ class Database {
         } catch (PDOException $e) {  
             return false;
         }
-
-        //check if database exists
         Database::checkDatabase();
-
         Database::$connected = true;
+        return true;
     }
 
     private static function prepare($query){
@@ -87,26 +85,16 @@ class Database {
     }
 
     private static function checkDatabase(){
-        $qry_create_db = "CREATE DATABASE IF NOT EXISTS ".DB_NAME." CHARACTER SET utf8 COLLATE utf8_unicode_ci;";
-        Database::query($qry_create_db);
-
+        Database::query("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
         Database::query("SET NAMES utf8");
-        
-        //select database
-        Database::$dbh->exec("USE ".DB_NAME);
-        
-        Database::query("CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`ips` ( `ip_id` INT NOT NULL AUTO_INCREMENT , `ip_key` TEXT NOT NULL, `ip` TEXT NOT NULL, `` TEXT NOT NULL, PRIMARY KEY (`ip_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
-        Database::query("CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`users` ( `user_id` INT NOT NULL AUTO_INCREMENT, `user_username` TEXT NOT NULL, `user_password` TEXT NOT NULL, `user_key` TEXT, `user_is_authorized` BOOLEAN NOT NULL DEFAULT 0, `user_is_admin` BOOLEAN NOT NULL DEFAULT 0, PRIMARY KEY (`user_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
-        Database::query("CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`users_ips` ( `user_ip_id` INT NOT NULL AUTO_INCREMENT, `user_id` INT NOT NULL, `ip_id` INT NOT NULL, PRIMARY KEY (`user_ip_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
-        Database::query("CREATE TABLE IF NOT EXISTS `".DB_NAME."`.`log` ( `user_ip_id` INT NOT NULL AUTO_INCREMENT, `user_id` INT NOT NULL, `ip_id` INT NOT NULL, PRIMARY KEY (`user_ip_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
-
+        Database::$dbh->exec("USE " . DB_NAME);
+        Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`orders` ( `order_id` INT NOT NULL AUTO_INCREMENT, `order_plans` TEXT NOT NULL, `order_state` TEXT NOT NULL, `order_code` TEXT NOT NULL, `order_paypal_id` TEXT NOT NULL, PRIMARY KEY (`order_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
+        Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`plans` ( `plan_id` INT NOT NULL AUTO_INCREMENT, `plan_name` TEXT NOT NULL, `plan_price` FLOAT NOT NULL, PRIMARY KEY (`plan_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
     }
 
     public static function preparedStatement($query, $keyToValueArr){ // $keyToValueArr = array(":key" => array(value, type));
         Database::$stmt = Database::$dbh->prepare($query);
-
         Database::bindValueArray($keyToValueArr);
-
         Database::$stmt->execute();
     }
 
