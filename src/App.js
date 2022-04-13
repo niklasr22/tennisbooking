@@ -155,23 +155,32 @@ class OrderForm extends React.Component {
                 label: 'pay'}}
               disabled={!this.state.paymentEnabled}
               createOrder={(_d, _a) => {
-                console.log("hallo");
-                console.log(this.state);
                 let orderData = {items: this.state.selection.map((item, index) => ({id: this.state.plans[index].id, quantity: item}))};
-                console.log(orderData);
-                return fetch(endpoint + "order/create", {
+                return fetch(endpoint + "orders/create", {
                   method: "post",
                   headers: {
                     'Content-Type': 'application/json'
                   },
                   body: JSON.stringify(orderData)
-                }).then((response) => {
-                  return response.json();
-                })
+                }).then((response) => response.json())
                   .then((order) => {
                     console.log(order);
                     return order.id;
                   });
+              }}
+              onApprove={(data, _a) => {
+                console.log("finished payment");
+                  return fetch(endpoint + `orders/${data.orderID}/capture`, {
+                    method: "post",
+                  })
+                    .then((response) => {
+                      let text = response.text();
+                      console.log(text);
+                      return JSON.parse(text);
+                    })
+                    .then((orderData) => {
+                      console.log(orderData);
+                    });
               }} />
         </PayPalScriptProvider>
       </div>

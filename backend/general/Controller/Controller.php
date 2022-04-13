@@ -6,13 +6,11 @@ abstract class Controller {
     }
 
     protected static function notFound() {
-        static::output("");
-        //static::output("", array("HTTP/1.1 404 Not Found"));
+        static::output("", array("HTTP/1.1 404 Not Found"));
     }
 
     protected static function unprocessable() {
-        static::output("");
-        //static::output("", header("HTTP/1.1 422 Unprocessable Entity"));
+        static::output("", header("HTTP/1.1 422 Unprocessable Entity"));
     }
 
     protected static function getUriSegments() {

@@ -65,13 +65,14 @@ class Paypal {
         return $response;
     }
 
-    public static function capturePayment(string $paymentId): string {
+    public static function capturePayment(string $paymentId) {
         $accessToken = static::generateAccessToken();
 
-        $ch = curl_init(static::API_BASE . "/v2/checkout/orders" . $paymentId . "/capture");
+        $ch = curl_init(static::API_BASE . "/v2/checkout/orders/" . $paymentId . "/capture");
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Authorization: Bearer " . $accessToken));
+        curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
+        $response = json_decode(curl_exec($ch), true);
         curl_close($ch);
 
         return $response;

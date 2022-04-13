@@ -25,7 +25,7 @@ if (count($uri) >= 2) {
             require_once "./general/Controller/PlanController.php";
             $controller = new PlanController();
             break;
-        case "order":
+        case "orders":
             require_once "./general/Paypal.php";
             require_once "./general/Controller/OrderController.php";
             $controller = new OrderController();

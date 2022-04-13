@@ -8,7 +8,11 @@ class OrderController extends Controller {
                 case "create":
                     $this->createOrder();
                     break;
+            }
+        } else if (count($segments) == 2 && preg_match("/^[0-9A-Z]+$/", $segments[0])) {
+            switch ($segments[1]) {
                 case "capture":
+                    $this->approvePayment();
                     break;
             }
         }
@@ -52,6 +56,33 @@ class OrderController extends Controller {
                 static::output(json_encode($response));
             } else {
                 static::output(json_encode(array("error" => "paypal_error")));
+            }
+        } else {
+            static::unprocessable();
+        }
+    }
+
+    private function approvePayment() {
+        if (static::getRequestMethod() == "POST") {
+            $paymentId = static::getUriSegments()[0];
+            Database::connect();
+            $paypalResponse = Paypal::capturePayment($paymentId);
+            if (isset($paypalResponse["id"]) && isset($paypalResponse["status"]) && $paypalResponse["status"] == "COMPLETED") {
+                //Orders::updateOrderStateByPaymentId($paymentId, OrderState::ORDER_STATE_PAYED);
+                Orders::updateOrderStateByPaymentId($paymentId, Orders::ORDER_STATE_PAYED);
+                $order = Orders::getOrderByPaymentId($paymentId);
+                $response = array(
+                    "state" => "success",
+                    "order" => $order,
+                    "paypal" => $paypalResponse
+                );
+                static::output(json_encode($response));
+            } else {
+                static::output(json_encode(array(
+                    "state" => "error", 
+                    "error" => "paypal_error",
+                    "paypal" => $paypalResponse
+                )));
             }
         } else {
             static::unprocessable();
