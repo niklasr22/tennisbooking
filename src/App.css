@@ -149,3 +149,31 @@ h1 {
 .OrderForm {
   padding: 1em;
 }
+
+.OrderDetails {
+  font-size: 1.2em;
+  text-align: left;
+}
+
+.OrderCode {
+  font-size: calc(10px + 3vmin);
+}
+
+.Error {
+  color: #ff0000;
+  font-size: 1.5em;
+}
+
+.NewBooking {
+  padding: 0.7em;
+  border-radius: 0.3em;
+  border: none;
+  font-size: 1.4em;
+  cursor: pointer;
+  color: #fff;
+  background-color: #0c9a5a;
+}
+
+.NewBooking:active, .NewBooking:hover {
+  background-color: #24854f;
+}

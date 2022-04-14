@@ -40,6 +40,13 @@ class Order {
         return $this->items;
     }
 
+    public function getAsArray(bool $withCode=true): array {
+        $vars = get_object_vars($this);
+        if (!$withCode)
+            unset($vars["code"]);
+        return $vars;
+    }
+
 }
 
 class Orders {

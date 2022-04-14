@@ -69,19 +69,23 @@ function Spinner() {
   return (<div className='Spinner'></div>)
 }
 
+let orderFormDefault = {
+  price: 0, 
+  counters: <Spinner />,
+  plans: [],
+  selection: [],
+  duration: 1,
+  paymentEnabled: false,
+  info: "Es müssen mindestens 2 Spieler eingetragen werden.",
+  completed: false,
+  order: null
+};
+
 class OrderForm extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      price: 0, 
-      counters: <Spinner />,
-      plans: [],
-      selection: [],
-      duration: 1,
-      paymentEnabled: false,
-      info: "Es müssen mindestens 2 Spieler eingetragen werden."
-    }
+    this.state = Object.assign({}, orderFormDefault);
   }
 
   counterChange(plan, amount) {
@@ -92,6 +96,7 @@ class OrderForm extends React.Component {
   }
 
   durationChange(duration) {
+    console.log("change");
     let newState = Object.assign({}, this.state, {duration: duration});
     this.setState(newState, () => this.updatePrice());
   }
@@ -116,25 +121,39 @@ class OrderForm extends React.Component {
     this.setState(newState);
   }
 
-  componentDidMount() {
+  updatePlans() {
     fetch(endpoint + 'plans')
       .then(response => response.json())
       .then(data => {
-        this.setState({
-          price: this.state.price,
+        this.setState(Object.assign({}, this.state, {
           plans: data.plans,
           counters: data.plans.map((item,index) => {
             return (<Counter label={item.name + " (" + priceString(item.price) + ")"} key={index} identfier={index} upperBounds="4" onCounterUpdated={(p, a) => this.counterChange(p, a)} />)
           }),
           selection: Array(data.plans.length).fill(0)
-        });
+        }));
       })
       .catch(error => {
         console.error('Error:', error);
       });
   }
 
-  render() {
+  componentDidMount() {
+    this.updatePlans();
+  }
+
+  showError(msg) {
+    this.setState(Object.assign({}, this.state, {info: <span className='Error'>{msg}</span>}));
+  }
+
+  setOrderCompleted(completed, order=null) {
+    if (!completed)
+      this.setState(Object.assign({}, orderFormDefault), () => this.updatePlans());
+    else
+      this.setState(Object.assign({}, this.state, {completed: completed, order: order}));
+  }
+
+  showOrderCreation() {
     return (
       <div className='OrderForm'>
         <p>Bitte geben Sie unten die Anzahl der Spieler je nach Status an. Es handelt sich insgesamt um eine Buchung für <strong>einen</strong> Tennisplatz.</p>
@@ -155,7 +174,7 @@ class OrderForm extends React.Component {
                 label: 'pay'}}
               disabled={!this.state.paymentEnabled}
               createOrder={(_d, _a) => {
-                let orderData = {items: this.state.selection.map((item, index) => ({id: this.state.plans[index].id, quantity: item}))};
+                let orderData = {items: this.state.selection.map((item, index) => ({id: this.state.plans[index].id, quantity: item})), duration: this.state.duration};
                 return fetch(endpoint + "orders/create", {
                   method: "post",
                   headers: {
@@ -163,9 +182,16 @@ class OrderForm extends React.Component {
                   },
                   body: JSON.stringify(orderData)
                 }).then((response) => response.json())
-                  .then((order) => {
-                    console.log(order);
-                    return order.id;
+                  .then((data) => {
+                    console.log(data);
+                    if (data.state === "paymentInitiated") {
+                      return data.id;
+                    } else if (data.state === "noOrderRequired") {
+                      this.showError("Das Spielen ist für alle ausgewählten Spieler kostenfrei.");
+                    } else {
+                      this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich an den Tennisverein.");
+                    }
+                    return -1;
                   });
               }}
               onApprove={(data, _a) => {
@@ -173,18 +199,52 @@ class OrderForm extends React.Component {
                   return fetch(endpoint + `orders/${data.orderID}/capture`, {
                     method: "post",
                   })
-                    .then((response) => {
-                      let text = response.text();
-                      console.log(text);
-                      return JSON.parse(text);
-                    })
-                    .then((orderData) => {
-                      console.log(orderData);
+                    .then((response) => response.json())
+                    .then((data) => {
+                      console.log(data);
+                      if (data.state === "success") {
+                        console.log("okcool")
+                        this.setOrderCompleted(true, data.order)
+                      } else {
+                        this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich mit Ihrer PayPal-Transaktionsnummer an den Tennisverein.");
+                      }
                     });
               }} />
         </PayPalScriptProvider>
       </div>
-    );
+    )
+  }
+
+  showOrderResumee() {
+    return (
+      <div className='OrderForm'>
+        <h2>Buchung erfolgreich</h2>
+        <p className='OrderCode'>Code: {this.state.order.code}</p>
+        <p><strong>Bitte speichern Sie Ihren Code unbedingt ab!</strong></p>
+        <div className='OrderDetails'>
+          <p>Buchung für folgende Spieler:</p>
+          <ul>
+            {this.state.order.items.items.map((item, _i) => {
+              return (<li>{item.quantity}x {item.name}</li>)
+            })}
+          </ul>
+          <p>davon bezahlt:</p>
+          <ul>
+            {this.state.order.items.payedItems.map((item, _i) => {
+              return (<li>{item.quantity}x {item.name}: {priceString(item.price * item.quantity)}</li>)
+            })}
+          </ul>
+          <p>Bestellungsnummer: {this.state.order.orderId}</p>
+          <p>PayPal Transaktionsnummer: {this.state.order.paymentId}</p>
+        </div>
+        <h3>Viel Spaß!</h3>
+        <button className='NewBooking' onClick={() => this.setOrderCompleted(false, null)}>Weitere Buchung</button>
+      </div>
+    )
+  }
+
+  render() {
+    return (this.state.completed ? this.showOrderResumee() : this.showOrderCreation());
   }
 }
 

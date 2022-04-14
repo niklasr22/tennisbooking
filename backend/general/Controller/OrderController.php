@@ -24,6 +24,7 @@ class OrderController extends Controller {
             $data = json_decode(file_get_contents('php://input'), true);
 
             $requestedItems = $data["items"];
+            $duration = intval($data["duration"]);
 
             $plans = array();
             foreach (Plans::getPlans() as $plan) {
@@ -38,8 +39,8 @@ class OrderController extends Controller {
                 array_push(
                     $items,
                     array(
-                        "name" => $plan["name"],
-                        "price" => $plan["price"],
+                        "name" => $plan["name"] . " (je " . $duration . " Stunde" . ($duration > 1 ? "n" : "") . ")",
+                        "price" => $plan["price"] * $duration,
                         "quantity" => $item["quantity"]
                     )
                 );
@@ -47,15 +48,30 @@ class OrderController extends Controller {
 
             usort($items, [Plans::class, "comparePlans"]);
             $payedItems = array_values(array_filter(array_slice($items, 0, 2), fn($item) => $item["price"] > 0));
-            
+            if ($payedItems[0]["quantity"] >= 2) {
+                $payedItems[0]["quantity"] = 2;
+                $payedItems = array_slice($payedItems, 0, 1);
+            } else if ($payedItems[1]["quantity"] >= 1){
+                $payedItems[1]["quantity"] = 1;
+            }
+
+            if (count($payedItems) == 0) {
+                static::output(json_encode(array("state" => "noOrderRequired")));
+            }
+
             Database::connect();
             $response = Paypal::createOrder($payedItems);
             if (isset($response["id"])) {
                 $internalOrderId = Orders::createOrder(array("items" => $items, "payedItems" => $payedItems), $response["id"]);
+                $response["state"] = "paymentInitiated";
                 $response["internalOrderId"] = $internalOrderId;
                 static::output(json_encode($response));
             } else {
-                static::output(json_encode(array("error" => "paypal_error")));
+                static::output(json_encode(array(
+                    "state" => "error", 
+                    "error" => "paypal_error",
+                    "paypal" => $response
+                )));
             }
         } else {
             static::unprocessable();
@@ -73,8 +89,7 @@ class OrderController extends Controller {
                 $order = Orders::getOrderByPaymentId($paymentId);
                 $response = array(
                     "state" => "success",
-                    "order" => $order,
-                    "paypal" => $paypalResponse
+                    "order" => $order->getAsArray(),
                 );
                 static::output(json_encode($response));
             } else {
