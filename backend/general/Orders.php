@@ -95,6 +95,21 @@ class Orders {
         return false;
     }
 
+    public static function getOrderByCode(string $code): Order|false {
+        Database::preparedStatement(
+            "SELECT * FROM orders WHERE order_code = :code",
+            array(
+                "code" => array($code, PDO::PARAM_STR)
+            )
+        );
+        $result = Database::fetchAll();
+        if (count($result) == 1) {
+            $order = $result[0];
+            return new Order($order["order_id"], $order["order_paypal_id"], $order["order_code"], $order["order_state"], $order["order_plans"]);
+        }
+        return false;
+    }
+
     private static function generateCode(int $length = 5): string {
         $alphabet = array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         $alphabetSize = count($alphabet) - 1;

@@ -9,7 +9,7 @@ const initialOptions = {
   currency: "EUR"
 };
 
-const endpoint = "http://tennisbooking.by-rousset.de/api.php/";
+const endpoint = "https://tennisbooking.by-rousset.de/api.php/";
 
 function priceString(price) {
   return Number(price).toLocaleString("de", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "€";
