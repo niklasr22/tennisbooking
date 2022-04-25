@@ -23,6 +23,10 @@ class OrderController extends Controller {
         if (static::getRequestMethod() == "POST") {
             $data = json_decode(file_get_contents('php://input'), true);
 
+            if (!isset($data["items"]) || !isset($data["duration"])) {
+                static::unprocessable();
+            }
+
             $requestedItems = $data["items"];
             $duration = intval($data["duration"]);
 

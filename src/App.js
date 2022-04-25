@@ -198,8 +198,7 @@ class OrderForm extends React.Component {
                 console.log("finished payment");
                   return fetch(endpoint + `orders/${data.orderID}/capture`, {
                     method: "post",
-                  })
-                    .then((response) => response.json())
+                  }).then((response) => response.json())
                     .then((data) => {
                       console.log(data);
                       if (data.state === "success") {

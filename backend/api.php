@@ -39,7 +39,9 @@ if (count($uri) >= 2) {
     }
 
     $requestHeaders = getallheaders();
-    if (isset($requestHeaders["Access-Control-Request-Method"]) && isset($requestHeaders["Access-Control-Request-Headers"])) {
+    $headers = array_map("strtolower", array_keys($requestHeaders));
+    if (strtoupper($_SERVER["REQUEST_METHOD"]) == "OPTIONS" && in_array("origin", $headers) && in_array("access-control-request-method", $headers) && in_array("access-control-request-headers", $headers)) {
+        http_response_code(200);
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
         header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE");
