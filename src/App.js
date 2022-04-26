@@ -183,7 +183,6 @@ class OrderForm extends React.Component {
                   body: JSON.stringify(orderData)
                 }).then((response) => response.json())
                   .then((data) => {
-                    console.log(data);
                     if (data.state === "paymentInitiated") {
                       return data.id;
                     } else if (data.state === "noOrderRequired") {
@@ -200,7 +199,6 @@ class OrderForm extends React.Component {
                     method: "post",
                   }).then((response) => response.json())
                     .then((data) => {
-                      console.log(data);
                       if (data.state === "success") {
                         console.log("okcool")
                         this.setOrderCompleted(true, data.order)

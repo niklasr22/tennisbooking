@@ -45,18 +45,24 @@ class OrderController extends Controller {
                     array(
                         "name" => $plan["name"] . " (je " . $duration . " Stunde" . ($duration > 1 ? "n" : "") . ")",
                         "price" => $plan["price"] * $duration,
-                        "quantity" => $item["quantity"]
+                        "quantity" => intval($item["quantity"])
                     )
                 );
             }
 
             usort($items, [Plans::class, "comparePlans"]);
-            $payedItems = array_values(array_filter(array_slice($items, 0, 2), fn($item) => $item["price"] > 0));
-            if ($payedItems[0]["quantity"] >= 2) {
-                $payedItems[0]["quantity"] = 2;
-                $payedItems = array_slice($payedItems, 0, 1);
-            } else if ($payedItems[1]["quantity"] >= 1){
-                $payedItems[1]["quantity"] = 1;
+            $payedItemsCandidates = array_slice($items, 0, 2);
+            $payedItems = array();
+            $pi_count = 0;
+            $max_payed = 2;
+            $i = 0;
+            while($pi_count < 2 && $i < count($payedItemsCandidates)) {
+                if ($payedItemsCandidates[$i]["quantity"] > $max_payed - $pi_count)
+                    $payedItemsCandidates[$i]["quantity"] = $max_payed - $pi_count;
+                if ($payedItemsCandidates[$i]["price"] > 0)
+                    array_push($payedItems, $payedItemsCandidates[$i]);
+                $pi_count += $payedItemsCandidates[$i]["quantity"];
+                $i++;
             }
 
             if (count($payedItems) == 0) {
