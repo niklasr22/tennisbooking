@@ -14,9 +14,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    #defaults:
-    #  run:
-    #    working-directory: ./frontend-public
+    defaults:
+      run:
+        working-directory: ./frontend-public
     
     strategy:
       matrix:
