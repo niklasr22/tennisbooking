@@ -3,16 +3,15 @@
 
 name: Node.js CI
 
+defaults:
+  run:
+    working-directory: ./frontend-public
+
 on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
-
-defaults:
-  run:
-    working-directory: ./frontend-public
-  
+    branches: [ master ]  
 
 jobs:
   build:
@@ -31,6 +30,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: ./frontend-public/package-lock.json
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
