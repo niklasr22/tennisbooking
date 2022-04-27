@@ -161,7 +161,7 @@ class OrderForm extends React.Component {
           {this.state.counters}
         </div>
         <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(_p,v) => this.durationChange(v)}/>
-        <div className='Pricing'><span>Preis:</span><span>{priceString(this.state.price)}</span></div>
+        <div className='Pricing'><span>$$$ Preis:</span><span>{priceString(this.state.price)}</span></div>
         <p>{this.state.info}</p>
         <PayPalScriptProvider options={initialOptions}>
             <PayPalButtons 
