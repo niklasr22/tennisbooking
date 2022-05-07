@@ -16,7 +16,7 @@ class OrderController extends Controller {
                     break;
             }
         }
-        static::notFound();
+        Api::notFound();
     }
     
     private function createOrder() {
@@ -24,7 +24,7 @@ class OrderController extends Controller {
             $data = json_decode(file_get_contents('php://input'), true);
 
             if (!isset($data["items"]) || !isset($data["duration"])) {
-                static::unprocessable();
+                Api::unprocessable();
             }
 
             $requestedItems = $data["items"];
@@ -84,7 +84,7 @@ class OrderController extends Controller {
                 )));
             }
         } else {
-            static::unprocessable();
+            Api::unprocessable();
         }
     }
 
@@ -110,7 +110,7 @@ class OrderController extends Controller {
                 )));
             }
         } else {
-            static::unprocessable();
+            Api::unprocessable();
         }
     }
 }

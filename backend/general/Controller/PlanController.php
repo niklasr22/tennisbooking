@@ -6,7 +6,7 @@ class PlanController extends Controller {
         if (count($segments) == 0) {
             $this->listPlans();
         }
-        static::notFound();
+        Api::notFound();
     }
 
     private function listPlans() {
@@ -14,7 +14,7 @@ class PlanController extends Controller {
             $plans = '{"plans": [{"id": 0, "name": "Gast", "price": 6.00}, {"id": 1, "name": "Tennisclub-Mitglied", "price": 0.00}, {"id": 2, "name": "TSV-Hauptvereinsmitglied", "price": 4.00}]}';
             static::output($plans);
         } else {
-            static::unprocessable();
+            Api::unprocessable();
         }
     }
 

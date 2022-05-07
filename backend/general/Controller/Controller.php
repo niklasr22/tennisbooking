@@ -2,15 +2,7 @@
 abstract class Controller {
 
     public function __call($name, $arguments) {
-        static::notFound();
-    }
-
-    protected static function notFound() {
-        static::output("", array("HTTP/1.1 404 Not Found"));
-    }
-
-    protected static function unprocessable() {
-        static::output("", header("HTTP/1.1 422 Unprocessable Entity"));
+        Api::notFound();
     }
 
     protected static function getUriSegments() {
