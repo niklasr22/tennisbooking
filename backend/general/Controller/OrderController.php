@@ -2,7 +2,7 @@
 class OrderController extends Controller {
 
     public function handleRequest() {
-        $segments = Controller::getUriSegments();
+        $segments = $this->getUriSegments();
         if (count($segments) == 1) {
             switch ($segments[0]) {
                 case "create":
@@ -20,7 +20,7 @@ class OrderController extends Controller {
     }
     
     private function createOrder() {
-        if (static::getRequestMethod() == "POST") {
+        if ($this->getRequestMethod() == "POST") {
             $data = json_decode(file_get_contents('php://input'), true);
 
             if (!isset($data["items"]) || !isset($data["duration"])) {
@@ -89,8 +89,8 @@ class OrderController extends Controller {
     }
 
     private function approvePayment() {
-        if (static::getRequestMethod() == "POST") {
-            $paymentId = static::getUriSegments()[0];
+        if ($this->getRequestMethod() == "POST") {
+            $paymentId = $this->getUriSegments()[0];
             Database::connect();
             $paypalResponse = Paypal::capturePayment($paymentId);
             if (isset($paypalResponse["id"]) && isset($paypalResponse["status"]) && $paypalResponse["status"] == "COMPLETED") {

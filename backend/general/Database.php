@@ -8,10 +8,10 @@ class Database {
     public static function connect(): bool {
         try {
             Database::$dbh = new PDO('mysql:host='.DB_HOST, DB_USER, DB_PASSWORD);
-        } catch (PDOException $e) {  
+        } catch (PDOException) {  
             return false;
         }
-        Database::checkDatabase();
+        Database::initDatabase();
         Database::$connected = true;
         return true;
     }
@@ -84,12 +84,25 @@ class Database {
         return Database::$dbh->lastInsertId();
     }
 
-    private static function checkDatabase(){
+    private static function initDatabase(){
+        Database::createDatabase();
+        Database::selectDatabase();
+        Database::createTables();
+    }
+
+    private static function createDatabase() {
         Database::query("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+    }
+
+    private static function selectDatabase() {
         Database::query("SET NAMES utf8");
         Database::$dbh->exec("USE " . DB_NAME);
+    }
+    
+    private static function createTables() {
         Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`orders` ( `order_id` INT NOT NULL AUTO_INCREMENT, `order_plans` TEXT NOT NULL, `order_state` TEXT NOT NULL, `order_code` TEXT NOT NULL, `order_paypal_id` TEXT NOT NULL, PRIMARY KEY (`order_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
         Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`plans` ( `plan_id` INT NOT NULL AUTO_INCREMENT, `plan_name` TEXT NOT NULL, `plan_price` FLOAT NOT NULL, PRIMARY KEY (`plan_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
+        Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`accounts` ( `plan_id` INT NOT NULL AUTO_INCREMENT, `plan_name` TEXT NOT NULL, `plan_price` FLOAT NOT NULL, PRIMARY KEY (`plan_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
     }
 
     public static function preparedStatement($query, $keyToValueArr){ // $keyToValueArr = array(":key" => array(value, type));

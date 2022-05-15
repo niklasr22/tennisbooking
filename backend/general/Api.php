@@ -21,21 +21,33 @@ class Api {
         }
     }
 
+    public function getUri(): array {
+        return $this->uri;
+    }
+
+    public function getRequestHeaders() {
+        return $this->requestHeaders;
+    }
+
+    public function getRequestMethod() {
+        return $this->requestMethod;
+    }
+
     private function selectController(): Controller {
         switch ($this->uri[2]) {
             case "plans":
                 require_once "./Controller/PlanController.php";
-                return new PlanController();
+                return new PlanController($this);
             case "orders":
                 require_once "./Paypal.php";
                 require_once "./Controller/OrderController.php";
-                return new OrderController();
+                return new OrderController($this);
             case "code":
                 require_once "./Controller/CodeController.php";
-                return new CodeController();
+                return new CodeController($this);
             case "auth":
                 require_once "./Controller/AuthController.php";
-                return new AuthController();
+                return new AuthController($this);
             default:
                 Api::notFound();
         }

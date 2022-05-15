@@ -1,21 +1,24 @@
 <?php
 abstract class Controller {
+    private Api $api;
+
+    public function __construct(Api $api) {
+        $this->api = $api;
+    }
 
     public function __call($name, $arguments) {
         Api::notFound();
     }
 
-    protected static function getUriSegments() {
-        $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-        $uri = explode("/", $uri);
-        return array_slice($uri, 3);
+    protected function getUriSegments() {
+        return $this->api->getUri();
     }
 
-    protected static function getRequestMethod() {
-        return strtoupper($_SERVER["REQUEST_METHOD"]);
+    protected function getRequestMethod() {
+        return $this->api->getRequestMethod();
     }
 
-    protected static function output($body, $httpHeaders = array(), $cors=true) {
+    protected static function output($body, $httpHeaders = array(), $cors = true) {
         if ($cors) {
             header("Access-Control-Allow-Origin: *");
             header("Access-Control-Allow-Credentials: true");
