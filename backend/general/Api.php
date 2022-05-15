@@ -36,17 +36,18 @@ class Api {
     private function selectController(): Controller {
         switch ($this->uri[2]) {
             case "plans":
-                require_once "./Controller/PlanController.php";
+                require_once __DIR__."/Controller/PlanController.php";
                 return new PlanController($this);
             case "orders":
-                require_once "./Paypal.php";
-                require_once "./Controller/OrderController.php";
+                require_once __DIR__."/Paypal.php";
+                require_once __DIR__."/Controller/OrderController.php";
                 return new OrderController($this);
             case "code":
-                require_once "./Controller/CodeController.php";
+                require_once __DIR__."/Controller/CodeController.php";
                 return new CodeController($this);
             case "auth":
-                require_once "./Controller/AuthController.php";
+                require_once __DIR__."/Accounts.php";
+                require_once __DIR__."/Controller/AuthController.php";
                 return new AuthController($this);
             default:
                 Api::notFound();

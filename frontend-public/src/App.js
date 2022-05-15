@@ -161,7 +161,7 @@ class OrderForm extends React.Component {
           {this.state.counters}
         </div>
         <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(_p,v) => this.durationChange(v)}/>
-        <div className='Pricing'><span>$$$ Preis:</span><span>{priceString(this.state.price)}</span></div>
+        <div className='Pricing'><span>Preis:</span><span>{priceString(this.state.price)}</span></div>
         <p>{this.state.info}</p>
         <PayPalScriptProvider options={initialOptions}>
             <PayPalButtons 
@@ -194,7 +194,6 @@ class OrderForm extends React.Component {
                   });
               }}
               onApprove={(data, _a) => {
-                console.log("finished payment");
                   return fetch(endpoint + `orders/${data.orderID}/capture`, {
                     method: "post",
                   }).then((response) => response.json())

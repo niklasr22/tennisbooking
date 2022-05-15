@@ -102,7 +102,7 @@ class Database {
     private static function createTables() {
         Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`orders` ( `order_id` INT NOT NULL AUTO_INCREMENT, `order_plans` TEXT NOT NULL, `order_state` TEXT NOT NULL, `order_code` TEXT NOT NULL, `order_paypal_id` TEXT NOT NULL, PRIMARY KEY (`order_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
         Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`plans` ( `plan_id` INT NOT NULL AUTO_INCREMENT, `plan_name` TEXT NOT NULL, `plan_price` FLOAT NOT NULL, PRIMARY KEY (`plan_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
-        Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`accounts` ( `plan_id` INT NOT NULL AUTO_INCREMENT, `plan_name` TEXT NOT NULL, `plan_price` FLOAT NOT NULL, PRIMARY KEY (`plan_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
+        Database::query("CREATE TABLE IF NOT EXISTS `" . DB_NAME . "`.`accounts` ( `account_id` INT NOT NULL AUTO_INCREMENT, `account_username` TEXT NOT NULL, `account_password` TEXT NOT NULL, `account_token` TEXT NOT NULL, `account_login_timestamp` TIMESTAMP NOT NULL, PRIMARY KEY (`account_id`)) CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;");
     }
 
     public static function preparedStatement($query, $keyToValueArr){ // $keyToValueArr = array(":key" => array(value, type));

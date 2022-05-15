@@ -1,9 +1,11 @@
 <?php
 abstract class Controller {
     private Api $api;
+    private array $uri;
 
     public function __construct(Api $api) {
         $this->api = $api;
+        $this->uri = array_slice($this->api->getUri(), 3);
     }
 
     public function __call($name, $arguments) {
@@ -11,7 +13,7 @@ abstract class Controller {
     }
 
     protected function getUriSegments() {
-        return $this->api->getUri();
+        return $this->uri;
     }
 
     protected function getRequestMethod() {

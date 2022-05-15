@@ -17,7 +17,7 @@ if(isset($_POST["code"])) {
             Orders::updateOrderStateByPaymentId($order->getPaymentId(), Orders::ORDER_STATE_REDEEMED);
         } else if ($order->getState() == Orders::ORDER_STATE_REDEEMED) {
             echo "<p style=\"color: red;\">Code schon benutzt!</p>";
-        } else if ($order->getState() == Orders::ORDER_STATE_REDEEMED) {
+        } else if ($order->getState() == Orders::ORDER_STATE_OPEN) {
             echo "<p style=\"color: red;\">Code nicht bezahlt!</p>";
         }
     } else {
