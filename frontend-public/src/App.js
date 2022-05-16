@@ -1,15 +1,13 @@
 import './App.css';
 import React from 'react';
 import logo from './logo.svg';
-import {PAYPAL_CLIENT_ID} from './config.js'
+import { PAYPAL_CLIENT_ID, API_ENDPOINT } from './config.js'
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const initialOptions = {
   "client-id": PAYPAL_CLIENT_ID,
   currency: "EUR"
 };
-
-const endpoint = "https://tennisbooking.by-rousset.de/api.php/";
 
 function priceString(price) {
   return Number(price).toLocaleString("de", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "€";
@@ -122,7 +120,7 @@ class OrderForm extends React.Component {
   }
 
   updatePlans() {
-    fetch(endpoint + 'plans')
+    fetch(API_ENDPOINT + 'plans')
       .then(response => response.json())
       .then(data => {
         this.setState(Object.assign({}, this.state, {
@@ -175,7 +173,7 @@ class OrderForm extends React.Component {
               disabled={!this.state.paymentEnabled}
               createOrder={(_d, _a) => {
                 let orderData = {items: this.state.selection.map((item, index) => ({id: this.state.plans[index].id, quantity: item})), duration: this.state.duration};
-                return fetch(endpoint + "orders/create", {
+                return fetch(API_ENDPOINT + "orders/create", {
                   method: "post",
                   headers: {
                     'Content-Type': 'application/json'
@@ -194,7 +192,7 @@ class OrderForm extends React.Component {
                   });
               }}
               onApprove={(data, _a) => {
-                  return fetch(endpoint + `orders/${data.orderID}/capture`, {
+                  return fetch(API_ENDPOINT + `orders/${data.orderID}/capture`, {
                     method: "post",
                   }).then((response) => response.json())
                     .then((data) => {
