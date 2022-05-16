@@ -33,6 +33,12 @@ class Api {
         return $this->requestMethod;
     }
 
+
+    public function handleAuthorization() {
+        if (!$this->checkAuthorization())
+            static::forbidden();
+    }
+
     private function selectController(): Controller {
         switch ($this->uri[2]) {
             case "plans":
@@ -63,6 +69,26 @@ class Api {
         exit;
     }
 
+    private function checkAuthorization(): bool {
+        $authorization = $this->parseAuthorization();
+        if (!$authorization)
+            return false;
+        require_once __DIR__."/Accounts.php";
+        return Accounts::validateTokenLogin($authorization);
+    }
+
+    private function parseAuthorization(): bool|string {
+        if (isset($this->requestHeaders["Authorization"])) {
+            $authorization = explode(" ", $this->requestHeaders["Authorization"]);
+            if ($authorization[0] != "Basic")
+                return false;
+            else
+                return $authorization[1];
+        } else {
+            return false;
+        }
+    }
+
     private function isPreflightRequest(): bool {
         return $this->requestMethod === "OPTIONS" 
                 && in_array("origin", $this->requestHeaders) 
@@ -86,6 +112,10 @@ class Api {
 
     public static function unprocessable() {
         Api::exitWithHeader("HTTP/1.1 422 Unprocessable Entity");
+    }
+
+    public static function forbidden() {
+        Api::exitWithHeader("HTTP/1.1 403 Forbidden");
     }
 
 }

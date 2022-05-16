@@ -10,7 +10,8 @@ class CodeController extends Controller {
         if (count($segments) == 2 && preg_match("/^[0-9A-Z]+$/", $segments[0])) {
             switch ($segments[1]) {
                 case "redeem":
-                    //$this->redeemCode($segments[0]);
+                    $this->api->handleAuthorization();
+                    $this->redeemCode($segments[0]);
                     break;
             }
         }

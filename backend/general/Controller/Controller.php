@@ -1,6 +1,6 @@
 <?php
 abstract class Controller {
-    private Api $api;
+    protected Api $api;
     private array $uri;
 
     public function __construct(Api $api) {

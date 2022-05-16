@@ -21,7 +21,7 @@ class Accounts {
         return password_verify($password, $hash);
     }
 
-    public static function validateTokenLogin(string $authorization) {
+    public static function validateTokenLogin(string $authorization): bool {
         $authData = static::parseAuthorization($authorization);
 
         Database::preparedStatement(
