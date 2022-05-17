@@ -1,8 +1,8 @@
 <?php
 class Paypal {
-    private const API_BASE = "https://api-m.sandbox.paypal.com";
+    private const API_BASE = PAYPAL_ENDPOINT;
 
-    public static function generateAccessToken(): string {
+    public static function generateAccessToken(): string|bool {
         $auth = base64_encode(PAYPAL_CLIENT_ID . ":" . PAYPAL_APP_SECRET);
 
         $ch = curl_init(static::API_BASE . "/v1/oauth2/token");
@@ -18,7 +18,12 @@ class Paypal {
 
         $data = json_decode($response);
 
-        return $data->access_token;
+        if (isset($data->access_token))
+            return $data->access_token;
+        else {
+            exit($response);
+            return false;
+        }
     }
 
     public static function createOrder($items) {
