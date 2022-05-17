@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import logo from './logo.svg';
-import { PAYPAL_CLIENT_ID, API_ENDPOINT } from './config.js'
+import { PAYPAL_CLIENT_ID, API_ENDPOINT, IMPRINT_URL } from './config.js'
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const initialOptions = {
@@ -94,7 +94,6 @@ class OrderForm extends React.Component {
   }
 
   durationChange(duration) {
-    console.log("change");
     let newState = Object.assign({}, this.state, {duration: duration});
     this.setState(newState, () => this.updatePrice());
   }
@@ -180,7 +179,10 @@ class OrderForm extends React.Component {
                   },
                   body: JSON.stringify(orderData)
                 }).then((response) => response.json())
+                  //.then((response) => response.text())
                   .then((data) => {
+                  //  console.log(data);
+                  //  data = JSON.parse(data);
                     if (data.state === "paymentInitiated") {
                       return data.id;
                     } else if (data.state === "noOrderRequired") {
@@ -197,7 +199,6 @@ class OrderForm extends React.Component {
                   }).then((response) => response.json())
                     .then((data) => {
                       if (data.state === "success") {
-                        console.log("okcool")
                         this.setOrderCompleted(true, data.order)
                       } else {
                         this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich mit Ihrer PayPal-Transaktionsnummer an den Tennisverein.");
@@ -205,6 +206,7 @@ class OrderForm extends React.Component {
                     });
               }} />
         </PayPalScriptProvider>
+        <p><a href={IMPRINT_URL}>Impressum</a></p>
       </div>
     )
   }

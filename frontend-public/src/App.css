@@ -177,3 +177,7 @@ h1 {
 .NewBooking:active, .NewBooking:hover {
   background-color: #24854f;
 }
+
+a {
+  color: #fff;
+}
