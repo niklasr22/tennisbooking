@@ -1,9 +1,9 @@
 <?php
 class CodeController extends Controller {
-    public static const CODE_STATE_VALID = "valid";
-    public static const CODE_STATE_INVALID = "invalid";
-    public static const CODE_STATE_UNPAYED = "unpayed";
-    public static const CODE_STATE_INEXISTENT = "inexistent";
+    public const CODE_STATE_VALID = "valid";
+    public const CODE_STATE_INVALID = "invalid";
+    public const CODE_STATE_UNPAYED = "unpayed";
+    public const CODE_STATE_INEXISTENT = "inexistent";
 
     public function handleRequest() {
         $segments = $this->getUriSegments();
