@@ -1,16 +1,16 @@
-import './App.css';
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import React from 'react';
+import './App.css';
+import { API_ENDPOINT, PAYPAL_CLIENT_ID } from './config.js';
 import logo from './logo.svg';
-import { PAYPAL_CLIENT_ID, API_ENDPOINT} from './config.js'
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const initialOptions = {
-  "client-id": PAYPAL_CLIENT_ID,
+  clientId: PAYPAL_CLIENT_ID,
   currency: "EUR"
 };
 
 function priceString(price) {
-  return Number(price).toLocaleString("de", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "€";
+  return Number(price).toLocaleString("de", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€";
 }
 
 class Counter extends React.Component {
@@ -68,7 +68,7 @@ function Spinner() {
 }
 
 let orderFormDefault = {
-  price: 0, 
+  price: 0,
   counters: <Spinner />,
   plans: [],
   selection: [],
@@ -89,13 +89,13 @@ class OrderForm extends React.Component {
   counterChange(plan, amount) {
     let selection = this.state.selection.slice();
     selection[plan] = amount;
-    let newState = Object.assign({}, this.state, {selection: selection});
+    let newState = Object.assign({}, this.state, { selection: selection });
     this.setState(newState, () => this.updatePrice());
   }
 
   durationChange(duration) {
     console.log("change");
-    let newState = Object.assign({}, this.state, {duration: duration});
+    let newState = Object.assign({}, this.state, { duration: duration });
     this.setState(newState, () => this.updatePrice());
   }
 
@@ -115,7 +115,7 @@ class OrderForm extends React.Component {
         info = "Das Spielen ist für alle ausgewählten Spieler kostenfrei.";
       }
     }
-    let newState = Object.assign({}, this.state, {price: price, paymentEnabled: paymentEnabled, info: info});
+    let newState = Object.assign({}, this.state, { price: price, paymentEnabled: paymentEnabled, info: info });
     this.setState(newState);
   }
 
@@ -125,7 +125,7 @@ class OrderForm extends React.Component {
       .then(data => {
         this.setState(Object.assign({}, this.state, {
           plans: data.plans,
-          counters: data.plans.map((item,index) => {
+          counters: data.plans.map((item, index) => {
             return (<Counter label={item.name + " (" + priceString(item.price) + ")"} key={index} identfier={index} upperBounds="4" onCounterUpdated={(p, a) => this.counterChange(p, a)} />)
           }),
           selection: Array(data.plans.length).fill(0)
@@ -141,14 +141,14 @@ class OrderForm extends React.Component {
   }
 
   showError(msg) {
-    this.setState(Object.assign({}, this.state, {info: <span className='Error'>{msg}</span>}));
+    this.setState(Object.assign({}, this.state, { info: <span className='Error'>{msg}</span> }));
   }
 
-  setOrderCompleted(completed, order=null) {
+  setOrderCompleted(completed, order = null) {
     if (!completed)
       this.setState(Object.assign({}, orderFormDefault), () => this.updatePlans());
     else
-      this.setState(Object.assign({}, this.state, {completed: completed, order: order}));
+      this.setState(Object.assign({}, this.state, { completed: completed, order: order }));
   }
 
   showOrderCreation() {
@@ -158,21 +158,23 @@ class OrderForm extends React.Component {
         <div className='PlayerTypes'>
           {this.state.counters}
         </div>
-        <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(_p,v) => this.durationChange(v)}/>
-        <div className='Pricing'><span>$$$ Preis:</span><span>{priceString(this.state.price)}</span></div>
+        <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(_p, v) => this.durationChange(v)} />
+        <div className='Pricing'><span>Preis:</span><span>{priceString(this.state.price)}</span></div>
         <p>{this.state.info}</p>
-        <PayPalScriptProvider options={initialOptions}>
-            <PayPalButtons 
-              className="Payment" 
-              fundingSource="paypal" 
+        <div className='PaymentBtn'>
+          <PayPalScriptProvider options={initialOptions}>
+            <PayPalButtons
+              className="Payment"
+              fundingSource="paypal"
               style={{
                 shape: 'pill',
                 color: 'silver',
                 layout: 'horizontal',
-                label: 'pay'}}
+                label: 'pay'
+              }}
               disabled={!this.state.paymentEnabled}
               createOrder={(_d, _a) => {
-                let orderData = {items: this.state.selection.map((item, index) => ({id: this.state.plans[index].id, quantity: item})), duration: this.state.duration};
+                let orderData = { items: this.state.selection.map((item, index) => ({ id: this.state.plans[index].id, quantity: item })), duration: this.state.duration };
                 return fetch(API_ENDPOINT + "orders/create", {
                   method: "post",
                   headers: {
@@ -193,19 +195,20 @@ class OrderForm extends React.Component {
               }}
               onApprove={(data, _a) => {
                 console.log("finished payment");
-                  return fetch(API_ENDPOINT + `orders/${data.orderID}/capture`, {
-                    method: "post",
-                  }).then((response) => response.json())
-                    .then((data) => {
-                      if (data.state === "success") {
-                        console.log("okcool")
-                        this.setOrderCompleted(true, data.order)
-                      } else {
-                        this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich mit Ihrer PayPal-Transaktionsnummer an den Tennisverein.");
-                      }
-                    });
+                return fetch(API_ENDPOINT + `orders/${data.orderID}/capture`, {
+                  method: "post",
+                }).then((response) => response.json())
+                  .then((data) => {
+                    if (data.state === "success") {
+                      console.log("okcool")
+                      this.setOrderCompleted(true, data.order)
+                    } else {
+                      this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich mit Ihrer PayPal-Transaktionsnummer an den Tennisverein.");
+                    }
+                  });
               }} />
-        </PayPalScriptProvider>
+          </PayPalScriptProvider>
+        </div>
       </div>
     )
   }
@@ -246,7 +249,7 @@ class OrderForm extends React.Component {
 function App() {
   return (
     <div className="App">
-      <div className='LogoWrapper'><img src={logo} alt="Logo"/></div>
+      <div className='LogoWrapper'><img src={logo} alt="Logo" /></div>
       <h1>Tennisplatz-Buchung</h1>
       <OrderForm />
     </div>
