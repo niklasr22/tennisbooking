@@ -5,7 +5,7 @@ import { API_ENDPOINT, PAYPAL_CLIENT_ID } from './config.js';
 import logo from './logo.svg';
 
 const initialOptions = {
-  "client-id": PAYPAL_CLIENT_ID,
+  clientId: PAYPAL_CLIENT_ID,
   currency: "EUR"
 };
 
@@ -161,52 +161,54 @@ class OrderForm extends React.Component {
         <Counter label="Spieldauer in Stunden" upperBounds="8" lowerBounds="1" defaultValue="1" onCounterUpdated={(_p, v) => this.durationChange(v)} />
         <div className='Pricing'><span>Preis:</span><span>{priceString(this.state.price)}</span></div>
         <p>{this.state.info}</p>
-        <PayPalScriptProvider options={initialOptions}>
-          <PayPalButtons
-            className="Payment"
-            fundingSource="paypal"
-            style={{
-              shape: 'pill',
-              color: 'silver',
-              layout: 'horizontal',
-              label: 'pay'
-            }}
-            disabled={!this.state.paymentEnabled}
-            createOrder={(_d, _a) => {
-              let orderData = { items: this.state.selection.map((item, index) => ({ id: this.state.plans[index].id, quantity: item })), duration: this.state.duration };
-              return fetch(API_ENDPOINT + "orders/create", {
-                method: "post",
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData)
-              }).then((response) => response.json())
-                .then((data) => {
-                  if (data.state === "paymentInitiated") {
-                    return data.id;
-                  } else if (data.state === "noOrderRequired") {
-                    this.showError("Das Spielen ist für alle ausgewählten Spieler kostenfrei.");
-                  } else {
-                    this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich an den Tennisverein.");
-                  }
-                  return -1;
-                });
-            }}
-            onApprove={(data, _a) => {
-              console.log("finished payment");
-              return fetch(API_ENDPOINT + `orders/${data.orderID}/capture`, {
-                method: "post",
-              }).then((response) => response.json())
-                .then((data) => {
-                  if (data.state === "success") {
-                    console.log("okcool")
-                    this.setOrderCompleted(true, data.order)
-                  } else {
-                    this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich mit Ihrer PayPal-Transaktionsnummer an den Tennisverein.");
-                  }
-                });
-            }} />
-        </PayPalScriptProvider>
+        <div className='PaymentBtn'>
+          <PayPalScriptProvider options={initialOptions}>
+            <PayPalButtons
+              className="Payment"
+              fundingSource="paypal"
+              style={{
+                shape: 'pill',
+                color: 'silver',
+                layout: 'horizontal',
+                label: 'pay'
+              }}
+              disabled={!this.state.paymentEnabled}
+              createOrder={(_d, _a) => {
+                let orderData = { items: this.state.selection.map((item, index) => ({ id: this.state.plans[index].id, quantity: item })), duration: this.state.duration };
+                return fetch(API_ENDPOINT + "orders/create", {
+                  method: "post",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(orderData)
+                }).then((response) => response.json())
+                  .then((data) => {
+                    if (data.state === "paymentInitiated") {
+                      return data.id;
+                    } else if (data.state === "noOrderRequired") {
+                      this.showError("Das Spielen ist für alle ausgewählten Spieler kostenfrei.");
+                    } else {
+                      this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich an den Tennisverein.");
+                    }
+                    return -1;
+                  });
+              }}
+              onApprove={(data, _a) => {
+                console.log("finished payment");
+                return fetch(API_ENDPOINT + `orders/${data.orderID}/capture`, {
+                  method: "post",
+                }).then((response) => response.json())
+                  .then((data) => {
+                    if (data.state === "success") {
+                      console.log("okcool")
+                      this.setOrderCompleted(true, data.order)
+                    } else {
+                      this.showError("Leider konnte Ihre Anfrage nicht fehlerfrei bearbeitet werden. Bitte wenden Sie sich mit Ihrer PayPal-Transaktionsnummer an den Tennisverein.");
+                    }
+                  });
+              }} />
+          </PayPalScriptProvider>
+        </div>
       </div>
     )
   }

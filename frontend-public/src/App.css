@@ -28,6 +28,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -62,7 +63,8 @@ h1 {
   cursor: pointer;
 }
 
-.Counter button:hover, .Counter button:active {
+.Counter button:hover,
+.Counter button:active {
   background-color: #cfa238;
   outline: none;
 }
@@ -131,6 +133,7 @@ h1 {
   0% {
     transform: translate(-50%, -50%) rotate(0deg);
   }
+
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
   }
@@ -174,6 +177,12 @@ h1 {
   background-color: #0c9a5a;
 }
 
-.NewBooking:active, .NewBooking:hover {
+.NewBooking:active,
+.NewBooking:hover {
   background-color: #24854f;
+}
+
+.PaymentBtn {
+  display: inline-block;
+  min-width: 400px;
 }
