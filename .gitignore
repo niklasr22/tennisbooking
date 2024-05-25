@@ -24,3 +24,5 @@ yarn-error.log*
 
 config.php
 config.js
+
+frontend-public/build
