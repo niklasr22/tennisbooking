@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 .App {
   text-align: center;
   background-color: #282c34;
@@ -184,5 +188,5 @@ h1 {
 
 .PaymentBtn {
   display: inline-block;
-  min-width: 400px;
+  min-width: 200px;
 }
