@@ -1,7 +1,7 @@
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import React from 'react';
 import './App.css';
-import { API_ENDPOINT, PAYPAL_CLIENT_ID } from './config.js';
+import { API_ENDPOINT, PAYPAL_CLIENT_ID } from "./runtimeConfig.js";
 import logo from './logo.svg';
 
 const initialOptions = {
